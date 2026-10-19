@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for react-socket-rps-server on 2026-10-19T12:57:44Z
+# fly.toml app configuration file generated for react-socket-rps-server-ic0fua on 2026-10-19T13:13:12Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'react-socket-rps-server'
+app = 'react-socket-rps-server-ic0fua'
 primary_region = 'ams'
 
 [build]
