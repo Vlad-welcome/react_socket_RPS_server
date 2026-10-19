@@ -12,7 +12,7 @@ app.set("port", port);
 const server = http.createServer(app);
 initSocket(server);
 
-server.listen(port, "0.0.0.0");
+server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
