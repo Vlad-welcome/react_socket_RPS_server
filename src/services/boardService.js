@@ -7,15 +7,28 @@ class boardService {
   }
 
   async join(boardId, userId) {
-    const [affectedRows] = await Board.update({ userId_2: userId }, { where: { id: boardId } });
-    return affectedRows > 0;
+    if (boardId && userId) {
+      const [affectedRows] = await Board.update({ userId_2: userId }, { where: { id: boardId } });
+      return affectedRows > 0;
+    }
   }
 
   async delete(id) {
-    const count = await Board.destroy({
-      where: { id: id },
-    });
-    return count > 0;
+    if (id) {
+      const count = await Board.destroy({
+        where: { id: id },
+      });
+      return count > 0;
+    }
+  }
+
+  async getById(id) {
+    if (id) {
+      const board = await Board.findOne({
+        where: { id: id },
+      });
+      return board;
+    }
   }
 }
 

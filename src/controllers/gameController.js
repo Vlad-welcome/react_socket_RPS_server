@@ -7,21 +7,35 @@ export const gameController = async (io, socket) => {
   socket.on(Events.ROOM, async (callback) => {
     console.log("Server Events.ROOM");
     const user = await userService.getBySocket(socket.id);
-    const board = await boardService.create(user.id);
-    callback({ boardId: board.id });
+
+    if (user) {
+      const board = await boardService.create(user.id);
+      if (board) {
+        callback({ success: true, boardId: board.id });
+        return;
+      }
+    }
+    callback({ success: false });
   });
 
-  socket.on(Events.INVITE, async (name, boardId) => {
+  socket.on(Events.INVITE, async (name, boardId, callback) => {
     console.log("Server Events.INVITE");
     const user = await userService.getByName(name);
 
-    await boardService.join(boardId, user.id);
+    if (user) {
+      await boardService.join(boardId, user.id);
 
-    //Пуш приглашённому игроку
-    io.to(user.socketId).emit(Events.INVITED, {
-      playerSocketId: socket.id,
-      boardId: boardId,
-    });
+      //Пуш приглашённому игроку
+      io.to(user.socketId).emit(Events.INVITED, {
+        playerSocketId: socket.id,
+        boardId: boardId,
+      });
+
+      callback({ success: true });
+      return;
+    }
+
+    callback({ success: false });
   });
 
   socket.on(Events.GAME_START, async (playerSocketId) => {
@@ -32,12 +46,17 @@ export const gameController = async (io, socket) => {
     });
   });
 
-  socket.on(Events.NEXT_TURN, async (boardId, cellId, player, enemySocketId) => {
+  socket.on(Events.NEXT_TURN, async (boardId, cellId, player, enemySocketId, isWin) => {
     console.log("Server Events.NEXT_TURN");
-    await cellService.create(boardId, cellId, player);
+    const board = await boardService.getById(boardId);
+    if (board) {
+      await cellService.create(boardId, cellId, player);
+    }
+
     io.to(enemySocketId).emit(Events.NEXT_TURNED, {
       cellId: cellId,
       player: player,
+      isWin: isWin,
     });
   });
 
